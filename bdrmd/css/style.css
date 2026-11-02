@@ -88,3 +88,9 @@ td{font-size:12px}td.title-cell{font-weight:600;color:#f4f4f4;overflow-wrap:anyw
  .site-nav .site-links{display:none!important}
  .site-nav .site-links.is-open{display:flex!important}
 }
+
+
+/* Logo da navegação no mesmo tamanho da página principal, inclusive no mobile */
+.site-nav{min-height:92px!important;padding-top:8px!important;padding-bottom:8px!important}
+.site-nav .site-brand img{width:240px!important;height:76px!important;max-width:240px!important;object-fit:contain!important;object-position:left center!important}
+@media(max-width:700px){.site-nav{min-height:92px!important;padding:8px 14px!important}.site-nav .site-brand img{width:240px!important;height:76px!important;max-width:240px!important}}
