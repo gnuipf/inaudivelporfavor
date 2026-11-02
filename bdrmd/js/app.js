@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const menuButton = document.querySelector(".nav-toggle");
+  document.addEventListener("DOMContentLoaded", () => {\n  const menuButton = document.querySelector(".nav-toggle");
   const siteLinks = document.querySelector(".site-links");
   if (menuButton && siteLinks) {
     menuButton.addEventListener("click", () => {
@@ -16,7 +16,7 @@
       menuButton.textContent = "☰";
     }));
   }
-  const $ = id => document.getElementById(id);
+  });\n  const $ = id => document.getElementById(id);
   const els = {
     search:$("search"), type:$("type-filter"), year:$("year-filter"), sort:$("sort"),
     clear:$("clear-filters"), rows:$("release-rows"), mobile:$("mobile-results"),
