@@ -94,3 +94,8 @@ td{font-size:12px}td.title-cell{font-weight:600;color:#f4f4f4;overflow-wrap:anyw
 .site-nav{min-height:92px!important;padding-top:8px!important;padding-bottom:8px!important}
 .site-nav .site-brand img{width:240px!important;height:76px!important;max-width:240px!important;object-fit:contain!important;object-position:left center!important}
 @media(max-width:700px){.site-nav{min-height:92px!important;padding:8px 14px!important}.site-nav .site-brand img{width:240px!important;height:76px!important;max-width:240px!important}}
+
+
+/* Alinhamento horizontal da logo igual ao cabeçalho da página inicial e da loja */
+.site-nav{padding-left:clamp(18px,6vw,90px)!important;padding-right:clamp(18px,6vw,90px)!important}
+@media(max-width:700px){.site-nav{padding-left:clamp(18px,6vw,90px)!important;padding-right:clamp(18px,6vw,90px)!important}}
