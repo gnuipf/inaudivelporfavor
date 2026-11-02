@@ -90,8 +90,7 @@
         else field+=c;
       } else if(c === '"' && field.length===0) quoted=true;
       else if(c === ","){row.push(field);field="";}
-      else if(c === "
-"){row.push(field);rows.push(row);row=[];field="";}
+      else if(c === "\n"){row.push(field);rows.push(row);row=[];field="";}
       else if(c !== "\r") field+=c;
     }
     if(field.length || row.length){row.push(field);rows.push(row);}
