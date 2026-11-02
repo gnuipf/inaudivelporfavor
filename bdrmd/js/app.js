@@ -1,5 +1,21 @@
 (() => {
   "use strict";
+  const menuButton = document.querySelector(".nav-toggle");
+  const siteLinks = document.querySelector(".site-links");
+  if (menuButton && siteLinks) {
+    menuButton.addEventListener("click", () => {
+      const isOpen = siteLinks.classList.toggle("is-open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.setAttribute("aria-label", isOpen ? "Fechar menu" : "Abrir menu");
+      menuButton.textContent = isOpen ? "×" : "☰";
+    });
+    siteLinks.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+      siteLinks.classList.remove("is-open");
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Abrir menu");
+      menuButton.textContent = "☰";
+    }));
+  }
   const $ = id => document.getElementById(id);
   const els = {
     search:$("search"), type:$("type-filter"), year:$("year-filter"), sort:$("sort"),
