@@ -1,5 +1,5 @@
 // Configure o telefone da loja com DDI + DDD + número, somente dígitos.
-const WHATSAPP="5500000000000"; // TROCAR pelo WhatsApp oficial da IPF.
+const WHATSAPP="5548996196699"; // WhatsApp oficial da IPF: +55 48 99619-6699.
 const products=[
 {id:"tee",name:"Camiseta IPF Original",cat:"vestuario",label:"VESTUÁRIO",desc:"Vista a identidade da Inaudível Por Favor.",price:"Valor sob consulta",symbol:"IPF"},
 {id:"hoodie",name:"Moletom IPF",cat:"vestuario",label:"VESTUÁRIO",desc:"Uma camada extra para os dias de muito barulho.",price:"Valor sob consulta",symbol:"LOUD"},
