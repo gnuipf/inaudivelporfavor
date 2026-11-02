@@ -1,6 +1,7 @@
 (() => {
   "use strict";
-  document.addEventListener("DOMContentLoaded", () => {\n  const menuButton = document.querySelector(".nav-toggle");
+  document.addEventListener("DOMContentLoaded", () => {
+  const menuButton = document.querySelector(".nav-toggle");
   const siteLinks = document.querySelector(".site-links");
   if (menuButton && siteLinks) {
     menuButton.addEventListener("click", () => {
@@ -16,7 +17,8 @@
       menuButton.textContent = "☰";
     }));
   }
-  });\n  const $ = id => document.getElementById(id);
+  });
+  const $ = id => document.getElementById(id);
   const els = {
     search:$("search"), type:$("type-filter"), year:$("year-filter"), sort:$("sort"),
     clear:$("clear-filters"), rows:$("release-rows"), mobile:$("mobile-results"),
@@ -88,7 +90,8 @@
         else field+=c;
       } else if(c === '"' && field.length===0) quoted=true;
       else if(c === ","){row.push(field);field="";}
-      else if(c === "\n"){row.push(field);rows.push(row);row=[];field="";}
+      else if(c === "
+"){row.push(field);rows.push(row);row=[];field="";}
       else if(c !== "\r") field+=c;
     }
     if(field.length || row.length){row.push(field);rows.push(row);}
