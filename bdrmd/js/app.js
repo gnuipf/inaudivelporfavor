@@ -26,7 +26,7 @@
     count:$("result-count"), status:$("source-status"), prev:$("prev"), next:$("next"),
     page:$("page-label"), size:$("page-size"), statReleases:$("stat-releases"),
     statBands:$("stat-bands"), statAnniversaries:$("stat-anniversaries"),
-    mapToggle:$("#mindmap-toggle"), mapPanel:$("#mindmap-panel"), map:$("#bdrmd-map"), mapLevel:$("#mindmap-level"), mapBack:$("#mindmap-back"), mapReset:$("#mindmap-reset"), mapViewport:document.querySelector(".mindmap-viewport")
+    mapToggle:$("mindmap-toggle"), mapPanel:$("mindmap-panel"), map:$("bdrmd-map"), mapLevel:$("mindmap-level"), mapBack:$("mindmap-back"), mapReset:$("mindmap-reset"), mapViewport:document.querySelector(".mindmap-viewport")
   };
   let allReleases = [];
   let currentPage = 1;
