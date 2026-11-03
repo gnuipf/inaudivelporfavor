@@ -166,8 +166,9 @@
     const start=(currentPage-1)*pageSize, pageItems=filtered.slice(start,start+pageSize);
     els.rows.innerHTML=pageItems.map(recordHTML).join("");
     els.mobile.innerHTML=pageItems.map(cardHTML).join("");
-    els.table.hidden=pageItems.length===0;
-    els.mobile.hidden=pageItems.length===0;
+    els.table.hidden=pageItems.length===0 || (els.mapPanel && !els.mapPanel.hidden);
+    els.mobile.hidden=pageItems.length===0 || (els.mapPanel && !els.mapPanel.hidden);
+    if(els.mapPanel && !els.mapPanel.hidden) renderMindMap();
     els.empty.hidden=filtered.length!==0;
     els.loading.hidden=true;
     els.count.textContent=filtered.length===allReleases.length
