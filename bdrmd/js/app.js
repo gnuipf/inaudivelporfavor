@@ -29,7 +29,11 @@
   };
   let allReleases = [];
   let currentPage = 1;
-  let filtered = [];\n  let mapDecade = null, mapMonth = null, mapView = {x:0,y:0,w:1000,h:1000}, mapDrag = null;\n  const svgNS = "http://www.w3.org/2000/svg";\n  const MAP_MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];\n  const MAP_SHORT = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+  let filtered = [];
+  let mapDecade = null, mapMonth = null, mapView = {x:0,y:0,w:1000,h:1000}, mapDrag = null;
+  const svgNS = "http://www.w3.org/2000/svg";
+  const MAP_MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const MAP_SHORT = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
   const TYPE_LABELS = {album:"Álbum",ep:"EP",single:"Single",compilation:"Compilação",demo:"Demo",live:"Ao vivo"};
   const clean = value => String(value ?? "").replace(/^\uFEFF/, "").trim();
   // Search normalization does not alter the original text shown to the user.
@@ -90,7 +94,8 @@
         else field+=c;
       } else if(c === '"' && field.length===0) quoted=true;
       else if(c === ","){row.push(field);field="";}
-      else if(c === "\n"){row.push(field);rows.push(row);row=[];field="";}
+      else if(c === "
+"){row.push(field);rows.push(row);row=[];field="";}
       else if(c !== "\r") field+=c;
     }
     if(field.length || row.length){row.push(field);rows.push(row);}
@@ -221,11 +226,15 @@
   };
   const setMapView=active=>{els.mapPanel.hidden=!active;els.mapToggle.setAttribute("aria-expanded",String(active));els.mapToggle.textContent=active?"▤ Voltar à Tabela":"✥ Mapa Mental";els.table.hidden=active||!filtered.length;els.mobile.hidden=active||!filtered.length;document.querySelector(".pagination").hidden=active;if(active){renderMindMap();els.mapPanel.scrollIntoView({behavior:"smooth",block:"start"});}};
   const resetMapView=()=>{mapDecade=null;mapMonth=null;renderMindMap();};
-\n  const resetPageAndRender=()=>{currentPage=1;render();};
+
+  const resetPageAndRender=()=>{currentPage=1;render();};
   [els.search,els.type,els.year,els.sort,els.size].forEach(el=>el.addEventListener(el===els.search?"input":"change",resetPageAndRender));
   els.clear.addEventListener("click",()=>{els.search.value="";els.type.value="";els.year.value="";els.sort.value="date-desc";currentPage=1;render();});
   els.prev.addEventListener("click",()=>{currentPage--;render();});
-  els.next.addEventListener("click",()=>{currentPage++;render();});\n  if(els.mapToggle){els.mapToggle.addEventListener("click",()=>setMapView(els.mapPanel.hidden));els.mapBack.addEventListener("click",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});els.mapReset.addEventListener("click",resetMapView);}\n  if(els.mapViewport){els.mapViewport.addEventListener("pointerdown",e=>{if(e.target.closest(".mm-decade")||e.target.closest(".mm-month")||e.target.closest(".mm-day")||e.target.closest(".mm-root-hit"))return;mapDrag={x:e.clientX,y:e.clientY,view:{...mapView}};els.mapViewport.classList.add("dragging");els.mapViewport.setPointerCapture(e.pointerId);});els.mapViewport.addEventListener("pointermove",e=>{if(!mapDrag)return;const rect=els.map.getBoundingClientRect(),dx=(e.clientX-mapDrag.x)*mapDrag.view.w/rect.width,dy=(e.clientY-mapDrag.y)*mapDrag.view.h/rect.height;mapView={...mapDrag.view,x:mapDrag.view.x-dx,y:mapDrag.view.y-dy};els.map.setAttribute("viewBox",Object.values(mapView).join(" "));});const stop=()=>{mapDrag=null;els.mapViewport.classList.remove("dragging")};els.mapViewport.addEventListener("pointerup",stop);els.mapViewport.addEventListener("pointercancel",stop);}\n  
+  els.next.addEventListener("click",()=>{currentPage++;render();});
+  if(els.mapToggle){els.mapToggle.addEventListener("click",()=>setMapView(els.mapPanel.hidden));els.mapBack.addEventListener("click",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});els.mapReset.addEventListener("click",resetMapView);}
+  if(els.mapViewport){els.mapViewport.addEventListener("pointerdown",e=>{if(e.target.closest(".mm-decade")||e.target.closest(".mm-month")||e.target.closest(".mm-day")||e.target.closest(".mm-root-hit"))return;mapDrag={x:e.clientX,y:e.clientY,view:{...mapView}};els.mapViewport.classList.add("dragging");els.mapViewport.setPointerCapture(e.pointerId);});els.mapViewport.addEventListener("pointermove",e=>{if(!mapDrag)return;const rect=els.map.getBoundingClientRect(),dx=(e.clientX-mapDrag.x)*mapDrag.view.w/rect.width,dy=(e.clientY-mapDrag.y)*mapDrag.view.h/rect.height;mapView={...mapDrag.view,x:mapDrag.view.x-dx,y:mapDrag.view.y-dy};els.map.setAttribute("viewBox",Object.values(mapView).join(" "));});const stop=()=>{mapDrag=null;els.mapViewport.classList.remove("dragging")};els.mapViewport.addEventListener("pointerup",stop);els.mapViewport.addEventListener("pointercancel",stop);}
+  
   loadData().then(records=>{
     allReleases=records;
     fillYears();
