@@ -29,7 +29,7 @@
   };
   let allReleases = [];
   let currentPage = 1;
-  let filtered = [];
+  let filtered = [];\n  let mapDecade = null, mapMonth = null, mapView = {x:0,y:0,w:1000,h:1000}, mapDrag = null;\n  const svgNS = "http://www.w3.org/2000/svg";\n  const MAP_MONTHS = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];\n  const MAP_SHORT = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
   const TYPE_LABELS = {album:"Álbum",ep:"EP",single:"Single",compilation:"Compilação",demo:"Demo",live:"Ao vivo"};
   const clean = value => String(value ?? "").replace(/^\uFEFF/, "").trim();
   // Search normalization does not alter the original text shown to the user.
@@ -179,11 +179,52 @@
     els.statBands.textContent=new Set(allReleases.map(r=>normalize(r.banda)).filter(Boolean)).size.toLocaleString("pt-BR");
     els.statAnniversaries.textContent=allReleases.filter(isAnniversaryToday).length.toLocaleString("pt-BR");
   };
-  const resetPageAndRender=()=>{currentPage=1;render();};
+
+  const mapEl=(tag,attrs={},text)=>{const n=document.createElementNS(svgNS,tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;return n;};
+  const mapPoint=(angle,r)=>{const a=angle*Math.PI/180;return{x:500+Math.cos(a)*r,y:500+Math.sin(a)*r};};
+  const mapBranch=(a,b,cls="mm-branch")=>els.map.append(mapEl("path",{d:"M"+a.x+","+a.y+" Q"+((a.x+b.x)/2)+","+((a.y+b.y)/2-12)+" "+b.x+","+b.y,class:cls}));
+  const mapGroups=()=>{const result=new Map();filtered.forEach(r=>{const d=parseDate(r.data);if(!d)return;const year=d.getFullYear(),decade=Math.floor(year/10)*10,month=d.getMonth()+1,day=d.getDate();if(!result.has(decade))result.set(decade,new Map());const byMonth=result.get(decade);if(!byMonth.has(month))byMonth.set(month,new Map());const byDay=byMonth.get(month);if(!byDay.has(day))byDay.set(day,[]);byDay.get(day).push(r);});return result;};
+  const mapRoot=(label,action)=>{const g=mapEl("g",{class:"mm-root-hit",role:"button",tabindex:"0","aria-label":label});g.append(mapEl("circle",{cx:500,cy:500,r:76,class:"mm-root"}),mapEl("text",{x:500,y:493,class:"mm-root-title"},"BDRMD"),mapEl("text",{x:500,y:516,class:"mm-root-sub"},label));g.addEventListener("click",action);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();action();}});els.map.append(g);};
+  const mapNode=(x,y,w,h,cls,title,sub,aria,action)=>{const g=mapEl("g",{role:"button",tabindex:"0","aria-label":aria});g.append(mapEl("rect",{x:x-w/2,y:y-h/2,width:w,height:h,rx:9,class:cls}),mapEl("text",{x,y:y-2,class:cls==="mm-decade"?"mm-decade-label":"mm-month-label"},title),mapEl("text",{x,y:y+14,class:cls==="mm-decade"?"mm-decade-count":"mm-month-count"},sub));g.addEventListener("click",action);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();action();}});els.map.append(g);};
+  const renderMindMap=()=>{
+    if(!els.mapPanel || els.mapPanel.hidden)return;
+    const groups=mapGroups();els.map.replaceChildren();
+    if(!groups.size){mapRoot("SEM LANÇAMENTOS",()=>{});els.mapLevel.textContent="Nenhum lançamento com data válida nos filtros atuais";els.mapBack.disabled=true;return;}
+    if(mapDecade!==null&&!groups.has(mapDecade)){mapDecade=null;mapMonth=null;}
+    if(mapMonth!==null&&!groups.get(mapDecade)?.has(mapMonth))mapMonth=null;
+    if(mapDecade===null){
+      const decades=[...groups.keys()].sort((a,b)=>a-b);
+      decades.forEach((decade,i)=>{const angle=-90+i*360/decades.length,p=mapPoint(angle,260),count=[...groups.get(decade).values()].reduce((s,days)=>s+[...days.values()].reduce((n,items)=>n+items.length,0),0);mapBranch({x:500,y:500},p);mapNode(p.x,p.y,116,54,"mm-decade",decade+"s",count+" lanç.","Década de "+decade+", "+count+" lançamentos",()=>{mapDecade=decade;mapMonth=null;renderMindMap();});});
+      mapRoot("DÉCADAS",()=>{mapDecade=null;mapMonth=null;renderMindMap();});
+      els.mapLevel.textContent="Nível 1 · Décadas · "+decades.length+" período(s)";
+    }else{
+      const months=groups.get(mapDecade),anchor=mapPoint(-90,165);mapBranch({x:500,y:500},anchor);
+      mapNode(anchor.x,anchor.y,124,54,"mm-decade selected",mapDecade+"s","DÉCADA","Voltar para todas as décadas",()=>{mapDecade=null;mapMonth=null;renderMindMap();});
+      [...months.keys()].sort((a,b)=>a-b).forEach(m=>{const angle=-90+(m-1)*30,p=mapPoint(angle,305),days=months.get(m),count=[...days.values()].reduce((s,a)=>s+a.length,0);mapBranch(anchor,p);mapNode(p.x,p.y,104,48,"mm-month"+(mapMonth===m?" selected":""),MAP_SHORT[m-1],count+" lanç.",MAP_MONTHS[m-1]+", "+count+" lançamentos",()=>{mapMonth=mapMonth===m?null:m;renderMindMap();});});
+      if(mapMonth!==null){
+        const p=mapPoint(-90+(mapMonth-1)*30,305),days=months.get(mapMonth),arr=[...days.keys()].sort((a,b)=>a-b),spread=Math.min(155,Math.max(70,arr.length*5)),start=-90+(mapMonth-1)*30-spread/2,today=new Date(),todayKey=(today.getMonth()+1)+"-"+today.getDate();
+        arr.forEach((day,i)=>{const angle=arr.length===1?-90+(mapMonth-1)*30:start+spread*i/(arr.length-1),dp=mapPoint(angle,445),records=days.get(day),isToday=(mapMonth+"-"+day)===todayKey;mapBranch(p,dp,"mm-month-branch");const node=mapEl("circle",{cx:dp.x,cy:dp.y,r:17,class:"mm-day"+(isToday?" today":""),role:"button",tabindex:"0","aria-label":"Dia "+day+" de "+MAP_MONTHS[mapMonth-1]+", "+records.length+" lançamentos"});const open=()=>showMapDay(mapMonth,day,records);node.addEventListener("click",open);node.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});els.map.append(node,mapEl("text",{x:dp.x,y:dp.y,class:"mm-day-label"},String(day)),mapEl("text",{x:dp.x,y:dp.y+27,class:"mm-day-count"},String(records.length));});
+      }
+      mapRoot(mapMonth!==null?"VOLTAR AO MÊS":"VOLTAR À DÉCADA",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});
+      els.mapLevel.textContent=mapMonth!==null?"Nível 3 · "+MAP_MONTHS[mapMonth-1]+" · "+mapDecade+"s":"Nível 2 · "+mapDecade+"s · Meses";
+    }
+    els.mapBack.disabled=mapDecade===null;
+  };
+  const showMapDay=(month,day,records)=>{
+    const panel=document.getElementById("mindmap-day-details");if(panel)panel.remove();
+    const detail=document.createElement("div");detail.id="mindmap-day-details";detail.className="notice";detail.style.marginTop="12px";
+    const title=document.createElement("strong");title.textContent=day+" de "+MAP_MONTHS[month-1]+" · "+records.length+" lançamento(s)";
+    const list=document.createElement("div");list.className="mindmap-day-list";
+    records.slice().sort((a,b)=>(parseDate(b.data)?.getTime()||0)-(parseDate(a.data)?.getTime()||0)).forEach(r=>{const item=document.createElement("div");item.className="mindmap-day-item";const band=document.createElement("b"),album=document.createElement("span"),year=document.createElement("small");band.textContent=r.banda||"Banda não informada";album.textContent=r.titulo||"Título não informado";year.textContent=dateText(r.data)+" · "+typeLabel(r.work_type);item.append(band,album,year);list.append(item);});
+    detail.append(title,list);els.mapPanel.append(detail);detail.scrollIntoView({behavior:"smooth",block:"nearest"});
+  };
+  const setMapView=active=>{els.mapPanel.hidden=!active;els.mapToggle.setAttribute("aria-expanded",String(active));els.mapToggle.textContent=active?"▤ Voltar à Tabela":"✥ Mapa Mental";els.table.hidden=active||!filtered.length;els.mobile.hidden=active||!filtered.length;document.querySelector(".pagination").hidden=active;if(active){renderMindMap();els.mapPanel.scrollIntoView({behavior:"smooth",block:"start"});}};
+  const resetMapView=()=>{mapDecade=null;mapMonth=null;renderMindMap();};
+\n  const resetPageAndRender=()=>{currentPage=1;render();};
   [els.search,els.type,els.year,els.sort,els.size].forEach(el=>el.addEventListener(el===els.search?"input":"change",resetPageAndRender));
   els.clear.addEventListener("click",()=>{els.search.value="";els.type.value="";els.year.value="";els.sort.value="date-desc";currentPage=1;render();});
   els.prev.addEventListener("click",()=>{currentPage--;render();});
-  els.next.addEventListener("click",()=>{currentPage++;render();});
+  els.next.addEventListener("click",()=>{currentPage++;render();});\n  if(els.mapToggle){els.mapToggle.addEventListener("click",()=>setMapView(els.mapPanel.hidden));els.mapBack.addEventListener("click",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});els.mapReset.addEventListener("click",resetMapView);}\n  if(els.mapViewport){els.mapViewport.addEventListener("pointerdown",e=>{if(e.target.closest(".mm-decade")||e.target.closest(".mm-month")||e.target.closest(".mm-day")||e.target.closest(".mm-root-hit"))return;mapDrag={x:e.clientX,y:e.clientY,view:{...mapView}};els.mapViewport.classList.add("dragging");els.mapViewport.setPointerCapture(e.pointerId);});els.mapViewport.addEventListener("pointermove",e=>{if(!mapDrag)return;const rect=els.map.getBoundingClientRect(),dx=(e.clientX-mapDrag.x)*mapDrag.view.w/rect.width,dy=(e.clientY-mapDrag.y)*mapDrag.view.h/rect.height;mapView={...mapDrag.view,x:mapDrag.view.x-dx,y:mapDrag.view.y-dy};els.map.setAttribute("viewBox",Object.values(mapView).join(" "));});const stop=()=>{mapDrag=null;els.mapViewport.classList.remove("dragging")};els.mapViewport.addEventListener("pointerup",stop);els.mapViewport.addEventListener("pointercancel",stop);}\n  
   loadData().then(records=>{
     allReleases=records;
     fillYears();
