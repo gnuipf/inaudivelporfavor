@@ -7,7 +7,7 @@
   <meta name="description" content="BDRMD — banco de dados de lançamentos de rock e metal da Inaudível Por Favor.">
   <title>BDRMD</title>
   <link rel="icon" href="../favicon-32x32.png" type="image/png">
-  <link rel="stylesheet" href="css/style.css?v=20261102-4">
+  <link rel="stylesheet" href="css/style.css?v=20261103-map">
 </head>
 <body>
   <header class="site-nav" style="position:relative;z-index:100;display:flex;align-items:center;justify-content:space-between;min-height:92px;padding:8px clamp(18px,6vw,90px);gap:20px;background:#090909;border-bottom:1px solid #303030">
@@ -74,10 +74,10 @@
         <h2>Lançamentos</h2>
         <p id="result-count" aria-live="polite">Carregando dados…</p>
       </div>
-      <p id="source-status" class="source-status">Inicializando base</p>
+      <div class="results-actions"><p id="source-status" class="source-status">Inicializando base</p><button id="mindmap-toggle" class="button button-map" type="button" aria-expanded="false">✥ Mapa Mental</button></div>
     </section>
 
-    <div id="error" class="notice error" role="alert" hidden></div>
+    <section id="mindmap-panel" class="mindmap-panel" hidden aria-label="Mapa mental de lançamentos"><div class="mindmap-heading"><div><h2>Mapa Mental</h2><p id="mindmap-level">Nível 1 · Décadas</p></div><div class="mindmap-controls"><button id="mindmap-back" class="button" type="button" disabled>← Voltar</button><button id="mindmap-reset" class="button" type="button">Visão geral</button></div></div><p class="mindmap-help">Selecione uma década, depois um mês e um dia para explorar os lançamentos. O mapa considera os filtros ativos.</p><div class="mindmap-viewport"><svg id="bdrmd-map" viewBox="0 0 1000 1000" role="img" aria-label="Mapa mental de décadas, meses e dias"></svg></div></section>\n    <div id="error" class="notice error" role="alert" hidden></div>
     <div id="loading" class="notice" role="status">Carregando lançamentos…</div>
     <div id="empty" class="notice" hidden>Nenhum lançamento corresponde à pesquisa.</div>
 
@@ -101,6 +101,6 @@
   </main>
   <footer><small>© 2026 INAUDÍVEL POR FAVOR. TODOS OS DIREITOS RESERVADOS.</small></footer>
   <script src="config.js?v=20261102-3"></script>
-  <script src="js/app.js?v=20261102-4"></script>
+  <script src="js/app.js?v=20261103-map"></script>
 </body>
 </html>
