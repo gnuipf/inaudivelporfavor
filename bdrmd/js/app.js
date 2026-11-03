@@ -95,8 +95,7 @@
         else field+=c;
       } else if(c === '"' && field.length===0) quoted=true;
       else if(c === ","){row.push(field);field="";}
-      else if(c === "
-"){row.push(field);rows.push(row);row=[];field="";}
+      else if(c === "\n"){row.push(field);rows.push(row);row=[];field="";}
       else if(c !== "\r") field+=c;
     }
     if(field.length || row.length){row.push(field);rows.push(row);}
@@ -210,7 +209,7 @@
       [...months.keys()].sort((a,b)=>a-b).forEach(m=>{const angle=-90+(m-1)*30,p=mapPoint(angle,305),days=months.get(m),count=[...days.values()].reduce((s,a)=>s+a.length,0);mapBranch(anchor,p);mapNode(p.x,p.y,104,48,"mm-month"+(mapMonth===m?" selected":""),MAP_SHORT[m-1],count+" lanç.",MAP_MONTHS[m-1]+", "+count+" lançamentos",()=>{mapMonth=mapMonth===m?null:m;renderMindMap();});});
       if(mapMonth!==null){
         const p=mapPoint(-90+(mapMonth-1)*30,305),days=months.get(mapMonth),arr=[...days.keys()].sort((a,b)=>a-b),spread=Math.min(155,Math.max(70,arr.length*5)),start=-90+(mapMonth-1)*30-spread/2,today=new Date(),todayKey=(today.getMonth()+1)+"-"+today.getDate();
-        arr.forEach((day,i)=>{const angle=arr.length===1?-90+(mapMonth-1)*30:start+spread*i/(arr.length-1),dp=mapPoint(angle,445),records=days.get(day),isToday=(mapMonth+"-"+day)===todayKey;mapBranch(p,dp,"mm-month-branch");const node=mapEl("circle",{cx:dp.x,cy:dp.y,r:17,class:"mm-day"+(isToday?" today":""),role:"button",tabindex:"0","aria-label":"Dia "+day+" de "+MAP_MONTHS[mapMonth-1]+", "+records.length+" lançamentos"});const open=()=>showMapDay(mapMonth,day,records);node.addEventListener("click",open);node.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});els.map.append(node,mapEl("text",{x:dp.x,y:dp.y,class:"mm-day-label"},String(day)),mapEl("text",{x:dp.x,y:dp.y+27,class:"mm-day-count"},String(records.length));});
+        arr.forEach((day,i)=>{const angle=arr.length===1?-90+(mapMonth-1)*30:start+spread*i/(arr.length-1),dp=mapPoint(angle,445),records=days.get(day),isToday=(mapMonth+"-"+day)===todayKey;mapBranch(p,dp,"mm-month-branch");const node=mapEl("circle",{cx:dp.x,cy:dp.y,r:17,class:"mm-day"+(isToday?" today":""),role:"button",tabindex:"0","aria-label":"Dia "+day+" de "+MAP_MONTHS[mapMonth-1]+", "+records.length+" lançamentos"});const open=()=>showMapDay(mapMonth,day,records);node.addEventListener("click",open);node.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});els.map.append(node,mapEl("text",{x:dp.x,y:dp.y,class:"mm-day-label"},String(day)),mapEl("text",{x:dp.x,y:dp.y+27,class:"mm-day-count"},String(records.length)));});
       }
       mapRoot(mapMonth!==null?"VOLTAR AO MÊS":"VOLTAR À DÉCADA",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});
       els.mapLevel.textContent=mapMonth!==null?"Nível 3 · "+MAP_MONTHS[mapMonth-1]+" · "+mapDecade+"s":"Nível 2 · "+mapDecade+"s · Meses";
