@@ -136,3 +136,7 @@ td{font-size:12px}td.title-cell{font-weight:600;color:#f4f4f4;overflow-wrap:anyw
 .mindmap-day-item{display:flex;flex-direction:column;gap:3px;padding:11px;border:1px solid #393333;border-left:2px solid #a33a45;border-radius:6px;background:#191616}
 .mindmap-day-item b{font-size:12px;color:#eee}.mindmap-day-item span{font-size:12px;color:#ccc}.mindmap-day-item small{font-size:10px;color:#888}
 @media(max-width:700px){.mindmap-day-list{grid-template-columns:1fr}}
+
+
+/* Ocultação temporária de elementos da loja */
+.temporarily-hidden{display:none!important}
