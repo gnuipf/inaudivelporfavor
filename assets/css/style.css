@@ -14,3 +14,7 @@
 .header{height:92px!important}
 .header .brand-logo,.footer .brand-logo{width:240px!important;height:76px!important;max-width:240px!important;object-fit:contain!important}
 @media(max-width:800px){.header{height:92px!important}.header .brand-logo,.footer .brand-logo{width:240px!important;height:76px!important;max-width:240px!important}}
+
+
+/* Ocultação temporária de elementos da loja, preservando o código original */
+.temporarily-hidden{display:none!important}
