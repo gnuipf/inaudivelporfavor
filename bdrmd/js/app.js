@@ -26,7 +26,7 @@
     count:$("result-count"), status:$("source-status"), prev:$("prev"), next:$("next"),
     page:$("page-label"), size:$("page-size"), statReleases:$("stat-releases"),
     statBands:$("stat-bands"), statAnniversaries:$("stat-anniversaries"),
-    mapToggle:$("mindmap-toggle"), mapPanel:$("mindmap-panel"), map:$("bdrmd-map"), mapLevel:$("mindmap-level"), mapBack:$("mindmap-back"), mapReset:$("mindmap-reset"), mapViewport:document.querySelector(".mindmap-viewport")
+    mapToggle:$("mindmap-toggle"), mapPanel:$("mindmap-panel"), map:$("bdrmd-map"), mapLevel:$("mindmap-level"), mapBack:$("mindmap-back"), mapReset:$("mindmap-reset"), mapZoomIn:$("mindmap-zoom-in"), mapZoomOut:$("mindmap-zoom-out"), mapViewport:document.querySelector(".mindmap-viewport")
   };
   let allReleases = [];
   let currentPage = 1;
@@ -225,15 +225,15 @@
     detail.append(title,list);els.mapPanel.append(detail);detail.scrollIntoView({behavior:"smooth",block:"nearest"});
   };
   const setMapView=active=>{els.mapPanel.hidden=!active;els.mapToggle.setAttribute("aria-expanded",String(active));els.mapToggle.textContent=active?"▤ Voltar à Tabela":"✥ Mapa Mental";els.table.hidden=active||!filtered.length;els.mobile.hidden=active||!filtered.length;document.querySelector(".pagination").hidden=active;if(active){renderMindMap();els.mapPanel.scrollIntoView({behavior:"smooth",block:"start"});}};
-  const resetMapView=()=>{mapDecade=null;mapMonth=null;renderMindMap();};
+  const applyMapView=()=>els.map.setAttribute("viewBox",`${mapView.x} ${mapView.y} ${mapView.w} ${mapView.h}`);\n  const zoomMap=factor=>{const nextW=Math.max(280,Math.min(1600,mapView.w*factor));const nextH=nextW;const centerX=mapView.x+mapView.w/2,centerY=mapView.y+mapView.h/2;mapView={x:centerX-nextW/2,y:centerY-nextH/2,w:nextW,h:nextH};applyMapView();};\n  const resetMapView=()=>{mapDecade=null;mapMonth=null;mapView={x:0,y:0,w:1000,h:1000};applyMapView();renderMindMap();};
 
   const resetPageAndRender=()=>{currentPage=1;render();};
   [els.search,els.type,els.year,els.sort,els.size].forEach(el=>el.addEventListener(el===els.search?"input":"change",resetPageAndRender));
   els.clear.addEventListener("click",()=>{els.search.value="";els.type.value="";els.year.value="";els.sort.value="date-desc";currentPage=1;render();});
   els.prev.addEventListener("click",()=>{currentPage--;render();});
   els.next.addEventListener("click",()=>{currentPage++;render();});
-  if(els.mapToggle){els.mapToggle.addEventListener("click",()=>setMapView(els.mapPanel.hidden));els.mapBack.addEventListener("click",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});els.mapReset.addEventListener("click",resetMapView);}
-  if(els.mapViewport){els.mapViewport.addEventListener("pointerdown",e=>{if(e.target.closest(".mm-decade")||e.target.closest(".mm-month")||e.target.closest(".mm-day")||e.target.closest(".mm-root-hit"))return;mapDrag={x:e.clientX,y:e.clientY,view:{...mapView}};els.mapViewport.classList.add("dragging");els.mapViewport.setPointerCapture(e.pointerId);});els.mapViewport.addEventListener("pointermove",e=>{if(!mapDrag)return;const rect=els.map.getBoundingClientRect(),dx=(e.clientX-mapDrag.x)*mapDrag.view.w/rect.width,dy=(e.clientY-mapDrag.y)*mapDrag.view.h/rect.height;mapView={...mapDrag.view,x:mapDrag.view.x-dx,y:mapDrag.view.y-dy};els.map.setAttribute("viewBox",Object.values(mapView).join(" "));});const stop=()=>{mapDrag=null;els.mapViewport.classList.remove("dragging")};els.mapViewport.addEventListener("pointerup",stop);els.mapViewport.addEventListener("pointercancel",stop);}
+  if(els.mapToggle){els.mapToggle.addEventListener("click",()=>setMapView(els.mapPanel.hidden));els.mapBack.addEventListener("click",()=>{if(mapMonth!==null)mapMonth=null;else mapDecade=null;renderMindMap();});els.mapReset.addEventListener("click",resetMapView);if(els.mapZoomIn)els.mapZoomIn.addEventListener("click",()=>zoomMap(0.8));if(els.mapZoomOut)els.mapZoomOut.addEventListener("click",()=>zoomMap(1.25));}
+  if(els.mapViewport){els.mapViewport.addEventListener("pointerdown",e=>{if(e.target.closest(".mm-decade")||e.target.closest(".mm-month")||e.target.closest(".mm-day")||e.target.closest(".mm-root-hit"))return;mapDrag={x:e.clientX,y:e.clientY,view:{...mapView}};els.mapViewport.classList.add("dragging");els.mapViewport.setPointerCapture(e.pointerId);});els.mapViewport.addEventListener("pointermove",e=>{if(!mapDrag)return;const rect=els.map.getBoundingClientRect(),dx=(e.clientX-mapDrag.x)*mapDrag.view.w/rect.width,dy=(e.clientY-mapDrag.y)*mapDrag.view.h/rect.height;mapView={...mapDrag.view,x:mapDrag.view.x-dx,y:mapDrag.view.y-dy};applyMapView();});const stop=()=>{mapDrag=null;els.mapViewport.classList.remove("dragging")};els.mapViewport.addEventListener("pointerup",stop);els.mapViewport.addEventListener("pointercancel",stop);}
   
   loadData().then(records=>{
     allReleases=records;
