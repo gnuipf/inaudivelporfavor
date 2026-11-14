@@ -225,7 +225,29 @@
     detail.append(title,list);els.mapPanel.append(detail);detail.scrollIntoView({behavior:"smooth",block:"nearest"});
   };
   const setMapView=active=>{els.mapPanel.hidden=!active;els.mapToggle.setAttribute("aria-expanded",String(active));els.mapToggle.textContent=active?"▤ Voltar à Tabela":"✥ Mapa Mental";els.table.hidden=active||!filtered.length;els.mobile.hidden=active||!filtered.length;document.querySelector(".pagination").hidden=active;if(active){renderMindMap();els.mapPanel.scrollIntoView({behavior:"smooth",block:"start"});}};
-  const applyMapView=()=>els.map.setAttribute("viewBox",`${mapView.x} ${mapView.y} ${mapView.w} ${mapView.h}`);\n  const zoomMap=factor=>{const nextW=Math.max(280,Math.min(1600,mapView.w*factor));const nextH=nextW;const centerX=mapView.x+mapView.w/2,centerY=mapView.y+mapView.h/2;mapView={x:centerX-nextW/2,y:centerY-nextH/2,w:nextW,h:nextH};applyMapView();};\n  const resetMapView=()=>{mapDecade=null;mapMonth=null;mapView={x:0,y:0,w:1000,h:1000};applyMapView();renderMindMap();};
+  const applyMapView=()=>els.map.setAttribute("viewBox",`${mapView.x} ${mapView.y} ${mapView.w} ${mapView.h}`);
+
+  const zoomMap=factor=>{
+    const nextW=Math.max(280,Math.min(1600,mapView.w*factor));
+    const nextH=nextW;
+    const centerX=mapView.x+mapView.w/2;
+    const centerY=mapView.y+mapView.h/2;
+    mapView={
+      x:centerX-nextW/2,
+      y:centerY-nextH/2,
+      w:nextW,
+      h:nextH
+    };
+    applyMapView();
+  };
+
+  const resetMapView=()=>{
+    mapDecade=null;
+    mapMonth=null;
+    mapView={x:0,y:0,w:1000,h:1000};
+    applyMapView();
+    renderMindMap();
+  };
 
   const resetPageAndRender=()=>{currentPage=1;render();};
   [els.search,els.type,els.year,els.sort,els.size].forEach(el=>el.addEventListener(el===els.search?"input":"change",resetPageAndRender));
